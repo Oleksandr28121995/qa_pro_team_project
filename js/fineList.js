@@ -6,22 +6,25 @@ window.fineList = {
 //Ця зміна містить всі дані які в нас зберігаються у файлі data
 let DB = data.finesData;
 
-function searchFines(searchKey){
-    /*
-     Напишіть свій код тут!
-     Як ви бачите функція повертає статичні дані.
-     Замість масиву який прописаний хардкодом, вам необхідно реалізувати цю функцію
-     так, щоб вона повертала масив відповідно переданому значенню в функцію.
-     Саме значення - це "Пошук за номером" або "Пошук за типом штрафу"
-     Тип штрафу може бути тільки
-     - Перевищення швидкості
-     - Невірне паркування
-     - Їзда у не тверезому стані
-     */
+function searchFines(searchKey) {
+    const normalizedSearchKey = searchKey.normalize().toLowerCase().trim();
+    // Визначаємо, чи введений рядок може бути номером штрафу
+    const isNumberFormat = /^\d+$/.test(normalizedSearchKey); // Припускаємо, що номери штрафів складаються лише з цифр
 
+    const filteredFines = DB.filter(fine => {
+        const normalizedFineNumber = fine.номер.normalize().toLowerCase().trim();
+        const normalizedFineType = fine.тип.normalize().toLowerCase().trim();
 
-    return [
-        {номер: '001', тип: 'Перевищення швидкості', сума: 100, дата: '2023-01-15'}
-    ];
+        // Якщо searchKey відповідає формату номера штрафу, проводимо пошук лише за номером
+        if (isNumberFormat) {
+            return normalizedFineNumber === normalizedSearchKey;
+        } 
+        // В іншому випадку вважаємо, що пошук здійснюється за типом штрафу
+        else {
+            return normalizedFineType.includes(normalizedSearchKey) && !isNumberFormat;
+        }
+    });
+
+    return filteredFines;
 }
 
